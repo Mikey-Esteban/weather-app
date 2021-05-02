@@ -1,25 +1,49 @@
 import React, { useState } from "react";
 import "./styles/App.css";
 import styled from "styled-components";
-import fetchData from "../services/fetchData";
+import fetchWeatherData from "../services/dataGathering/fetchWeatherData";
+import fetchGifData from "../services/dataGathering/fetchGifData";
+import calculateDayOrNight from "../services/calculations/calculateDayOrNight";
 
-import Search from "./Search";
+import Search from "./UI/Search";
 import WeatherInfo from "./WeatherInfo";
 
 const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  color: white;
+
+  &::after {
+    content: "";
+    background: url(${props => props.background});
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center-top;
+    background-size: cover;
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
+  }
+
+  height: 100vh;
+  width: 100%;
 `;
 
 function App() {
   const [loadData, setLoadData] = useState(false);
   const [weatherData, setWeatherData] = useState({});
+  const [background, setBackground] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = (event, query) => {
     event.preventDefault();
-    fetchData(query)
+    fetchWeatherData(query)
       .then(response => {
         console.log(response);
         const data = response.data;
@@ -33,6 +57,19 @@ function App() {
         };
         const description = data.weather[0].description;
         const icon = data.weather[0].icon;
+        const time_period = calculateDayOrNight(
+          timeInfo.currentTime,
+          timeInfo.sunrise,
+          timeInfo.sunset
+        );
+        fetchGifData("rainyChillhopDay")
+          .then(response => {
+            console.log("GIF RESPONSE", response);
+            setBackground(response.data.data.images.original.url);
+          })
+          .catch(error => {
+            console.log("GIF ERROR", error);
+          });
         setWeatherData({
           location,
           tempInfo,
@@ -59,12 +96,12 @@ function App() {
 
   return (
     <div className="App">
-      <AppWrapper>
+      <AppWrapper background={background}>
         <Search handleSubmit={handleSubmit} />
         <div id="errorMessage">{errorMessage}</div>
         <div id="weatherInfo">
           {loadData ? (
-            <WeatherInfo data={weatherData} />
+            <WeatherInfo data={weatherData} background={background} />
           ) : (
             <span id="searchCTA">Enter a city to find out the weather!</span>
           )}

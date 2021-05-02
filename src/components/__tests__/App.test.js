@@ -2,8 +2,6 @@ import React from "react";
 import { shallow, mount } from "enzyme";
 
 import App from "../App";
-import Search from "../Search";
-import WeatherInfo from "../WeatherInfo";
 
 describe("App", () => {
   let wrapper;
@@ -17,7 +15,7 @@ describe("App", () => {
 
   it("has an Search component", () => {
     wrapper = mount(<App />);
-    expect(wrapper.find(Search).length).toBe(1);
+    expect(wrapper.find("Search").length).toBe(1);
   });
 
   it("has an error message div", () => {
