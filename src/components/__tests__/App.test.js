@@ -9,27 +9,44 @@ describe("App", () => {
     wrapper = shallow(<App />);
   });
 
-  it("renders properly", () => {
-    shallow(<App />);
+  it("renders", () => {
+    expect(shallow(<App />).exists()).toBeTruthy();
   });
 
-  it("has an Search component", () => {
-    wrapper = mount(<App />);
-    expect(wrapper.find("Search").length).toBe(1);
+  it("renders Search component", () => {
+    wrapper = shallow(<App />);
+    expect(wrapper.find("Search").exists()).toBeTruthy();
   });
 
-  it("has an error message div", () => {
-    expect(wrapper.find("#errorMessage").length).toBe(1);
+  it("renders error message div", () => {
+    expect(wrapper.find("#errorMessage")).toBeTruthy();
   });
 
-  it("has a weatherInfo div", () => {
-    expect(wrapper.find("#weatherInfo").length).toBe(1);
+  describe("cities info", () => {
+    const props = { showCityCards: true };
+
+    it("renders when showCityCards is true", () => {
+      let wrapper = shallow(<App {...props} />);
+      expect(wrapper.find("#cityCards").exists()).toBeTruthy();
+    });
   });
 
-  it("default weather div as a search call to action span", () => {
-    expect(wrapper.find("#weatherInfo").find("span").length).toBe(1);
-    expect(wrapper.find("#searchCTA").text()).toBe(
-      "Enter a city to find out the weather!"
-    );
+  describe("weather info", () => {
+    const props = { showWeather: true };
+
+    it("renders", () => {
+      expect(wrapper.find("#weatherInfo").exists()).toBeTruthy();
+    });
+    it("default renders search CTA span", () => {
+      expect(wrapper.find("#weatherInfo").find("span").length).toBe(1);
+      expect(wrapper.find("#searchCTA").text()).toBe(
+        "Enter a city to find out the weather!"
+      );
+    });
+
+    it("when showWeather is true it renders WeatherInfo component", () => {
+      wrapper = shallow(<App {...props} />);
+      expect(wrapper.find("WeatherInfo").exists()).toBeTruthy();
+    });
   });
 });
