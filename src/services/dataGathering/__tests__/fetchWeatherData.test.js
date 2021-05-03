@@ -5,7 +5,7 @@ import fetchData from "../fetchWeatherData";
 jest.mock("axios");
 
 describe("fetchData", () => {
-  const query = "austin";
+  const query = "4671654";
   const API_key = process.env.REACT_APP_OPENWEATHER_SECRET;
 
   it("fetches data successfully from an API", async () => {
@@ -21,7 +21,7 @@ describe("fetchData", () => {
     await expect(fetchData(query)).resolves.toEqual(data);
 
     expect(axios.get).toHaveBeenCalledWith(
-      `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_key}`
+      `https://api.openweathermap.org/data/2.5/weather?id=${query}&appid=${API_key}`
     );
   });
 
