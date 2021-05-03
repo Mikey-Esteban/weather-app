@@ -1,18 +1,36 @@
 import findCity from "../findCity";
 
 describe("findCity", () => {
-  const data = [
+  const cities = [
     {
       id: 0,
       name: "Pallet Town",
-      state: "",
-      country: "Kanto",
-      coord: {
-        lon: 47.159401,
-        lat: 34.330502
-      }
+      lat: 46.89,
+      lon: 177.83
+    },
+    {
+      id: 1,
+      name: "Victory Road",
+      lat: 87.89,
+      lon: 77.83
+    },
+    {
+      id: 2,
+      name: "Victory Road",
+      lat: 100.8,
+      lon: 17.83
     }
   ];
 
-  expect(findCity("pallet town")).toEqual(data[0]);
+  it("loads", () => {
+    expect(findCity).toBeTruthy();
+  });
+
+  it("returns first city when name is `pallet town`", () => {
+    expect(findCity("pallet town", cities)).toEqual([cities[0]]);
+  });
+
+  it("returns second and third city when name is `victory ROAD`", () => {
+    expect(findCity("victory ROAD", cities)).toEqual([cities[1], cities[2]]);
+  });
 });
