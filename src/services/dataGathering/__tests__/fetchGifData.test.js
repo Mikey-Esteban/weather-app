@@ -6,10 +6,12 @@ jest.mock("axios");
 
 describe("fetchData", () => {
   const weather = {
-    rain: "t7Qb8655Z1VfBGr5XB",
-    clearNight: "xUPGcshrKRahaS8ef6"
+    night: {
+      rainy: "pVGsAWjzvXcZW4ZBTE"
+    }
   };
-  const query = "clearNight";
+  const type = "rainy";
+  const time = "night";
   const API_key = process.env.REACT_APP_GIPHY_API_KEY;
 
   it("fetches data successfully from API", async () => {
@@ -22,10 +24,10 @@ describe("fetchData", () => {
     };
     axios.get.mockImplementationOnce(() => Promise.resolve(data));
 
-    await expect(fetchData(weather[query])).resolves.toEqual(data);
+    await expect(fetchData(time, type)).resolves.toEqual(data);
 
     expect(axios.get).toHaveBeenCalledWith(
-      `https://api.giphy.com/v1/gifs/${weather[query]}?api_key=${API_key}`
+      `https://api.giphy.com/v1/gifs/${weather[time][type]}?api_key=${API_key}`
     );
   });
 
@@ -36,6 +38,6 @@ describe("fetchData", () => {
       Promise.reject(new Error(errorMessage))
     );
 
-    await expect(fetchData(query)).rejects.toThrow(errorMessage);
+    await expect(fetchData(time, type)).rejects.toThrow(errorMessage);
   });
 });
