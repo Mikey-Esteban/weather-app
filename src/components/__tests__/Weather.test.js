@@ -17,12 +17,6 @@ describe("Weather", () => {
   it("renders", () => {
     expect(wrapper.exists()).toBeTruthy();
   });
-  it("default renders search CTA span", () => {
-    expect(wrapper.find("#searchCTA").exists()).toBeTruthy();
-    expect(wrapper.find("#searchCTA").text()).toBe(
-      "Enter a city to find out the weather!"
-    );
-  });
 
   it("renders WeatherInfo component when weatherData exists", () => {
     wrapper = shallow(<Weather {...props} />);
