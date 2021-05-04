@@ -1,5 +1,5 @@
 import React from "react";
-import { shallow, mount } from "enzyme";
+import { shallow } from "enzyme";
 
 import App from "../App";
 
@@ -22,31 +22,11 @@ describe("App", () => {
     expect(wrapper.find("#errorMessage")).toBeTruthy();
   });
 
-  describe("cities info", () => {
-    const props = { showCityCards: true };
-
-    it("renders when showCityCards is true", () => {
-      let wrapper = shallow(<App {...props} />);
-      expect(wrapper.find("#cityCards").exists()).toBeTruthy();
-    });
+  it("renders Cities component", () => {
+    expect(wrapper.find("Cities").exists()).toBeTruthy();
   });
 
-  describe("weather info", () => {
-    const props = { showWeather: true };
-
-    it("renders", () => {
-      expect(wrapper.find("#weatherInfo").exists()).toBeTruthy();
-    });
-    it("default renders search CTA span", () => {
-      expect(wrapper.find("#weatherInfo").find("span").length).toBe(1);
-      expect(wrapper.find("#searchCTA").text()).toBe(
-        "Enter a city to find out the weather!"
-      );
-    });
-
-    it("when showWeather is true it renders WeatherInfo component", () => {
-      wrapper = shallow(<App {...props} />);
-      expect(wrapper.find("WeatherInfo").exists()).toBeTruthy();
-    });
+  it("renders Weather component", () => {
+    expect(wrapper.find("Weather").exists()).toBeTruthy();
   });
 });

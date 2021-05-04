@@ -6,48 +6,74 @@ import findCity from "../services/dataGathering/findCity";
 import fetchWeatherData from "../services/dataGathering/fetchWeatherData";
 import fetchGifData from "../services/dataGathering/fetchGifData";
 import calculateDayOrNight from "../services/calculations/calculateDayOrNight";
+import calculateWeatherType from "../services/calculations/calculateWeatherType";
 
 import Search from "./UI/Search";
-import WeatherInfo from "./WeatherInfo";
+import Cities from "./Cities";
+import Weather from "./Weather";
 
 import * as data from "../assets/city.list.json";
 const cities = Object.values(data)[0];
-console.log(cities);
 
-function App({ showWeather = false, showCityCards = false }) {
-  // const [loadData, setLoadData] = useState(false);
+const collateWeatherData = data => {
+  const location = `${data.name}, ${data.sys.country}`;
+  const tempInfo = data.main;
+  const timeInfo = {
+    timezone: data.timezone,
+    currentTime: data.dt,
+    sunrise: data.sys.sunrise,
+    sunset: data.sys.sunset
+  };
+
+  const description = data.weather[0].description;
+  const icon = data.weather[0].icon;
+
+  return { location, tempInfo, timeInfo, description, icon };
+};
+
+function App() {
+  const [citiesData, setCitiesData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [background, setBackground] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (event, query) => {
+  const handleSearchSubmit = (event, query) => {
     event.preventDefault();
     const queryResults = findCity(query, cities);
     console.log("QR", queryResults);
-    queryResults.length > 1 && (showCityCards = true);
+    console.log(queryResults.length);
+    setCitiesData(queryResults);
+    if (queryResults.length > 1) {
+      console.log("WHAT UP");
+    } else {
+      // run something
+    }
   };
 
-  const something = query => {
-    fetchWeatherData(query)
+  const handleCityClick = cityId => event => {
+    fetchWeatherData(cityId)
       .then(response => {
         console.log(response);
         const data = response.data;
-        const location = `${data.name}, ${data.sys.country}`;
-        const tempInfo = data.main;
-        const timeInfo = {
-          timezone: data.timezone,
-          currentTime: data.dt,
-          sunrise: data.sys.sunrise,
-          sunset: data.sys.sunset
-        };
-        const description = data.weather[0].description;
-        const icon = data.weather[0].icon;
+        const {
+          location,
+          tempInfo,
+          timeInfo,
+          description,
+          icon
+        } = collateWeatherData(data);
+
+        let weatherType = calculateWeatherType(
+          data.weather[0].main,
+          data.weather[0].id
+        );
         const time_period = calculateDayOrNight(
           timeInfo.currentTime,
           timeInfo.sunrise,
           timeInfo.sunset
         );
-        fetchGifData("rainyChillhopDay")
+
+        fetchGifData(time_period, weatherType)
           .then(response => {
             console.log("GIF RESPONSE", response);
             setBackground(response.data.data.images.original.url);
@@ -63,7 +89,7 @@ function App({ showWeather = false, showCityCards = false }) {
           icon
         });
         setErrorMessage("");
-        // setLoadData(true);
+        setCitiesData(null);
       })
       .catch(error => {
         if (error.response) {
@@ -82,16 +108,14 @@ function App({ showWeather = false, showCityCards = false }) {
   return (
     <div className="App">
       <AppWrapper background={background}>
-        <Search handleSubmit={handleSubmit} />
+        <Search handleSubmit={handleSearchSubmit} />
         <div id="errorMessage">{errorMessage}</div>
-        {showCityCards && <div id="cityCards"></div>}
-        <div id="weatherInfo">
-          {showWeather ? (
-            <WeatherInfo data={weatherData} background={background} />
-          ) : (
-            <span id="searchCTA">Enter a city to find out the weather!</span>
-          )}
-        </div>
+        <Cities citiesData={citiesData} handleClick={handleCityClick} />
+        <Weather
+          weatherData={weatherData}
+          background={background}
+          mode={"celsius"}
+        />
       </AppWrapper>
     </div>
   );

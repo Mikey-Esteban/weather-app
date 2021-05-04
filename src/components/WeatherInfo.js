@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import calculateTime from "../services/calculations/calculateTime";
 import calculateTemp from "../services/calculations/calculateTemp";
-import { MainWrapper, TempWrapper, TimeWrapper } from "./styles/WeatherInfo";
+import {
+  MainWrapper,
+  HeaderWrapper,
+  ImageWrapper,
+  TempWrapper,
+  TimeWrapper
+} from "./styles/WeatherInfo";
 
 import Toggle from "./UI/Toggle";
 
 const WeatherInfo = props => {
-  console.log(props);
-  console.log(props.background);
-  // console.log(props);
   const imgUrl = `http://openweathermap.org/img/wn/${props.data.icon}@2x.png`;
   const unix_current = props.data.timeInfo.currentTime;
   const unix_sunrise = props.data.timeInfo.sunrise;
@@ -28,20 +31,28 @@ const WeatherInfo = props => {
 
   return (
     <MainWrapper id="main">
-      <span id="location">{props.data.location}</span>
-      <img src={imgUrl} alt={props.data.description} />
+      <HeaderWrapper id="header">
+        <span id="location">{props.data.location}</span>
+        <span id="description">{props.data.description}</span>
+      </HeaderWrapper>
+
+      <ImageWrapper>
+        <img src={imgUrl} alt={props.data.description} />
+      </ImageWrapper>
 
       <TempWrapper id="tempInfo">
         <div id="mainTemp">
           <h1>{calculateTemp(temp_now, tempMode)}º</h1>
-          <span>humidity: {humidity}</span>
         </div>
         <div id="sideTemp">
-          <span>max: {calculateTemp(temp_max, tempMode)}º</span>
-          <span>min: {calculateTemp(temp_min, tempMode)}º</span>
-          <span>feels like: {calculateTemp(temp_feels_like, tempMode)}º</span>
+          <Toggle handleToggle={handleToggle} />
+          <span id="maxTemp">max: {calculateTemp(temp_max, tempMode)}º</span>
+          <span id="minTemp">min: {calculateTemp(temp_min, tempMode)}º</span>
+          <span id="feelsLike">
+            feels like: {calculateTemp(temp_feels_like, tempMode)}º
+          </span>
+          <span id="humidity">humidity: {humidity}</span>
         </div>
-        <Toggle handleToggle={handleToggle} />
       </TempWrapper>
 
       <TimeWrapper>
