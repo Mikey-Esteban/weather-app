@@ -1,3 +1,9 @@
-### A simple project working with APIs
+### A simple weather project working with APIs
 
-This project was taken from [I'm an inline-style link](https://www.theodinproject.com/paths/full-stack-ruby-on-rails/courses/javascript/lessons/weather-app)
+This project was taken from [The Odin Project](https://www.theodinproject.com/paths/full-stack-ruby-on-rails/courses/javascript/lessons/weather-app)
+
+### APIs involved
+
+- [Open Weather](https://openweathermap.org/api)
+- [GIPHY](https://giphy.com/)
+- [Country Flags](https://www.countryflags.io/)
