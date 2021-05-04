@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const SearchWrapper = styled.div`
   margin-top: 200px;
+  margin-bottom: 10px;
   width: 400px;
 
   input {
