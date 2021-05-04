@@ -16,6 +16,7 @@ import Weather from "./Weather";
 
 import * as data from "../assets/city.list.json";
 const cities = Object.values(data)[0];
+console.log(cities);
 
 function App() {
   const [query, setQuery] = useState("");
