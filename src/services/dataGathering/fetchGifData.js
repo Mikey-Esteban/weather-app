@@ -4,7 +4,7 @@ const weather = {
   day: {
     rainy: "iiJ870TcI3PZKxatzS",
     sunny: "2wh8ugh52dGSJYrA26",
-    cloudy: "jQyztJ1gSbMvrI2XH8",
+    cloudy: "I2QPaWgUp4Ow8",
     snowy: "FjURk1y29dX4Q",
     misty: "3o72F65dJl7Z0PtdjG"
   },
