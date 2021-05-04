@@ -7,6 +7,8 @@ import fetchWeatherData from "../services/dataGathering/fetchWeatherData";
 import fetchGifData from "../services/dataGathering/fetchGifData";
 import calculateDayOrNight from "../services/calculations/calculateDayOrNight";
 import calculateWeatherType from "../services/calculations/calculateWeatherType";
+import collateWeatherData from "./utils/collateWeatherData";
+import handleErrors from "./utils/handleErrors";
 
 import Search from "./UI/Search";
 import Cities from "./Cities";
@@ -15,62 +17,28 @@ import Weather from "./Weather";
 import * as data from "../assets/city.list.json";
 const cities = Object.values(data)[0];
 
-const collateWeatherData = data => {
-  const location = `${data.name}, ${data.sys.country}`;
-  const tempInfo = data.main;
-  const timeInfo = {
-    timezone: data.timezone,
-    currentTime: data.dt,
-    sunrise: data.sys.sunrise,
-    sunset: data.sys.sunset
-  };
-
-  const description = data.weather[0].description;
-  const icon = data.weather[0].icon;
-
-  return { location, tempInfo, timeInfo, description, icon };
-};
-
 function App() {
+  const [query, setQuery] = useState("");
   const [citiesData, setCitiesData] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [background, setBackground] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSearchSubmit = (event, query) => {
-    event.preventDefault();
-    const queryResults = findCity(query, cities);
-    console.log("QR", queryResults);
-    console.log(queryResults.length);
-    setCitiesData(queryResults);
-    if (queryResults.length > 1) {
-      console.log("WHAT UP");
-    } else {
-      // run something
-    }
-  };
-
-  const handleCityClick = cityId => event => {
+  const grabAndSetWeatherData = cityId => {
     fetchWeatherData(cityId)
       .then(response => {
         console.log(response);
         const data = response.data;
-        const {
-          location,
-          tempInfo,
-          timeInfo,
-          description,
-          icon
-        } = collateWeatherData(data);
+        setWeatherData(collateWeatherData(data));
 
         let weatherType = calculateWeatherType(
           data.weather[0].main,
           data.weather[0].id
         );
         const time_period = calculateDayOrNight(
-          timeInfo.currentTime,
-          timeInfo.sunrise,
-          timeInfo.sunset
+          data.dt,
+          data.sys.sunrise,
+          data.sys.sunset
         );
 
         fetchGifData(time_period, weatherType)
@@ -79,36 +47,48 @@ function App() {
             setBackground(response.data.data.images.original.url);
           })
           .catch(error => {
-            console.log("GIF ERROR", error);
+            const message = handleErrors(error);
+            setErrorMessage(message);
           });
-        setWeatherData({
-          location,
-          tempInfo,
-          timeInfo,
-          description,
-          icon
-        });
         setErrorMessage("");
         setCitiesData(null);
       })
       .catch(error => {
-        if (error.response) {
-          // Request made and server responded
-          setErrorMessage(error.response.data.message);
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.log("error REQUEST", error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log("error MESSAGE", error.message);
-        }
+        const message = handleErrors(error);
+        setErrorMessage(message);
       });
+  };
+
+  const handleInputChange = e => {
+    setQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = (event, query) => {
+    event.preventDefault();
+    const queryResults = findCity(query, cities);
+    console.log(queryResults);
+    setQuery("");
+    if (queryResults.length > 1) {
+      setCitiesData(queryResults);
+    } else if (queryResults.length === 0) {
+      setErrorMessage("couldn't find city");
+    } else {
+      grabAndSetWeatherData(queryResults[0].id);
+    }
+  };
+
+  const handleCityClick = cityId => event => {
+    grabAndSetWeatherData(cityId);
   };
 
   return (
     <div className="App">
       <AppWrapper background={background}>
-        <Search handleSubmit={handleSearchSubmit} />
+        <Search
+          handleSubmit={handleSearchSubmit}
+          handleInputChange={handleInputChange}
+          query={query}
+        />
         <div id="errorMessage">{errorMessage}</div>
         <Cities citiesData={citiesData} handleClick={handleCityClick} />
         <Weather
@@ -116,6 +96,9 @@ function App() {
           background={background}
           mode={"celsius"}
         />
+        {!weatherData && !citiesData && (
+          <span id="searchCTA">Enter a city to find out the weather!</span>
+        )}
       </AppWrapper>
     </div>
   );

@@ -5,7 +5,7 @@ const AppWrapper = styled.div`
   flex-direction: column;
   align-items: center;
 
-  color: white;
+  font-size: 14px;
 
   &::after {
     content: "";

@@ -29,4 +29,11 @@ describe("App", () => {
   it("renders Weather component", () => {
     expect(wrapper.find("Weather").exists()).toBeTruthy();
   });
+
+  it("default renders search CTA span", () => {
+    expect(wrapper.find("#searchCTA").exists()).toBeTruthy();
+    expect(wrapper.find("#searchCTA").text()).toBe(
+      "Enter a city to find out the weather!"
+    );
+  });
 });
