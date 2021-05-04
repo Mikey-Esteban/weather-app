@@ -5,14 +5,22 @@ import Search from "../Search";
 
 describe("Search", () => {
   let wrapper;
+  let initialProps = {
+    handleSubmit: jest.fn(),
+    handleInputChange: jest.fn(value => {
+      console.log("hello", value);
+      initialProps.query = value;
+    }),
+    query: ""
+  };
   beforeEach(() => {
-    wrapper = shallow(<Search />);
+    wrapper = shallow(<Search {...initialProps} />);
   });
 
   // SEARCH INPUT
   describe("input", () => {
-    it("exists", () => {
-      expect(wrapper.find("input[type='text']").length).toBe(1);
+    it("renders", () => {
+      expect(wrapper.find("input[type='text']").exists()).toBeTruthy();
     });
 
     it("has the correct props", () => {
@@ -22,30 +30,25 @@ describe("Search", () => {
         type: "text",
         placeholder: "...enter city here",
         value: "",
-        onChange: expect.any(Function)
+        onChange: initialProps.handleInputChange
       });
     });
 
-    it("should set the query value on change event", () => {
-      wrapper.find("input[type='text']").simulate("change", {
-        target: { value: "austin" }
-      });
-      expect(wrapper.find("input[type='text']").prop("value")).toEqual(
-        "austin"
-      );
+    it("onChange calls handleInputChange", () => {
+      const input = wrapper.find("input");
+      input.simulate("change");
+      expect(initialProps.handleInputChange).toHaveBeenCalledTimes(1);
     });
   });
 
   // SEARCH BUTTON
   describe("button", () => {
-    it("exists with text `Search`", () => {
-      expect(wrapper.find("button").length).toBe(1);
+    it("renders with text `Search`", () => {
+      expect(wrapper.find("button").exists()).toBeTruthy();
       expect(wrapper.find("button").text()).toBe("Search");
     });
 
     it("has the correct props", () => {
-      const handleSubmit = jest.fn();
-      wrapper = shallow(<Search handleSubmit={handleSubmit} />);
       expect(wrapper.find("button").props()).toEqual({
         children: "Search",
         onClick: expect.any(Function)
@@ -53,21 +56,8 @@ describe("Search", () => {
     });
 
     it("clicking search button calls handleSubmit", () => {
-      const handleSubmit = jest.fn();
-      wrapper = shallow(<Search handleSubmit={handleSubmit} />);
       wrapper.find("button").simulate("click");
-      expect(handleSubmit).toHaveBeenCalledTimes(1);
-    });
-
-    it("clicking search button calls with correct parameter", () => {
-      const handleSubmit = jest.fn(query => {});
-      const event = undefined;
-      wrapper = shallow(<Search handleSubmit={handleSubmit} />);
-      wrapper.find('input[type="text"]').simulate("change", {
-        target: { value: "austin" }
-      });
-      wrapper.find("button").simulate("click");
-      expect(handleSubmit).toHaveBeenCalledWith(event, "austin");
+      expect(initialProps.handleSubmit).toHaveBeenCalledTimes(1);
     });
   });
 });
